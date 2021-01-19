@@ -1,5 +1,5 @@
-(function() {
-    'use strict';
+(function(window, document) {
+    'use strict'
     /*
     1. Envolva todo o conteúdo desse desafio em uma IIFE.
     2. Adicione a diretiva 'use strict';
@@ -16,45 +16,45 @@
     nome, `username` deve receber "Desconhecido".
     Com a resposta, mostre um alert com a mensagem "Bem vindo [USERNAME]!"
     */
-    let username = prompt( 'Qual o seu nome?' );
-    username ? console.log( 'Bem vindo ' + username ) : console.log( 'Desconhecido ');
+    let username = prompt( 'Qual o seu nome?' ) || 'desconhecido'
+    alert( 'Bem vindo ' + username )
 
     /*
     Agora, pergunte ao usuário "Qual o seu e-mail?", atribuindo o resultado à
     uma variável chamada `email`.
     */
-    let email = prompt( 'Qual o seu email?' );
+    let email = prompt( 'Qual o seu email?' )
 
     /*
     - Selecione o input de "Nome", atribuindo-o à uma variável chamada
     `$inputUsername`.
     */
-    let $inputUsername = document.querySelectorAll('input')[0];
+    let $inputUsername = document.querySelectorAll('input')[0]
 
     /*
     - Selecione o input de "Email", atribuindo-o à uma variável chamada
     `$inputEmail`.
     */
-    let $inputEmail = document.querySelectorAll('input')[1];
+    let $inputEmail = document.querySelectorAll('input')[1]
 
     /*
     - Selecione o campo de "Mensagem", atribuindo-o à uma variável chamada
     `$message`.
     */
-    let $message = document.querySelector('textarea');
+    let $message = document.querySelector('textarea')
 
     /*
     - Selecione o botão de envio do formulário, atribuindo-o à uma variável
     chamada `$button`.
     */
-    let $button = document.querySelector('button');
+    let $button = document.querySelector('button')
 
     /*
     Preencha os campos de "Nome" e "Email" que estão no documento com os valores
     entrados pelo usuário.
     */
-    $inputUsername.value = username;
-    $inputEmail.value = email;
+    $inputUsername.value = username
+    $inputEmail.value = email
 
     /*
     Adicione um listener de evento de click ao botão que faça o seguinte:
@@ -81,19 +81,22 @@
         - "Não enviado."
     */
     
-    $button.addEventListener('click', function() {
+    $button.addEventListener('click', function( event ) {
+        event.preventDefault()
+        console.log(isValidEmail($inputEmail.value))
+
         if( !$inputUsername.value )
-            alert( 'Preencha o nome do usuário!' );
+            return alert( 'Preencha o nome do usuário!' )
         if( !$inputEmail.value )
-            alert( 'Preencha o email! ' );            
-        if( !$message )
-            alert('Preencha a menssagem! ');
-        /*if( $inputUsername.value 
-            && $inputEmail.value 
-            && $message.value )
-            confirm( 'Tem certeza que deseja enviar o formulário?' ) 
-            ? alert( 'Enviado com sucesso!' )
-            : alert( 'Não enviado.' );*/
+            return alert( 'Preencha o email!')
+        if( !isValidEmail( $inputEmail.value ) )
+            return  alert( 'Digite um email válido! ')
+        if( !$message.value )
+            return alert( 'Preencha a mensagem!')
+        if( confirm( 'Tem certeza que deseja enviar o formulário?' ) )
+            return alert( 'Enviado com sucesso!' )
+        
+        return alert( 'Não enviado.' );
     });
 
     /*
@@ -104,12 +107,9 @@
     As regras para validação são:
         - O nome do usuário (antes do arroba), pode ser qualquer caractere
         alfanumérico, incluindo o underscore, sinal de "+" e o ponto;
-        - Após o arroba, o domínio pode conter somente caracteres alfanuméricos
-        e o underscore;
-        - Para a extensão, o domínio deve vir seguido de um ponto, e no mínimo
-        2 caracteres alfanuméricos;
-        - O final do domínio é opcional, mas se existir, deve começar com um
-        ponto, seguido de no máximo 2 caracteres alfanuméricos.
+        - Após o arroba, o domínio pode conter somente caracteres alfanuméricos e o underscore;
+        - Para a extensão, o domínio deve vir seguido de um ponto, e no mínimo 2 caracteres alfanuméricos;
+        - O final do domínio é opcional, mas se existir, deve começar com um ponto, seguido de no máximo 2 caracteres alfanuméricos.
 
     Alguns e-mails válidos que podem ser usados para testar:
         - "meu.email+categoria@gmail.com"
@@ -122,5 +122,7 @@
         - "rita-marica@titica.a.b"
         - "agua_@evida.br.com"
     */
-    // ?
+    function isValidEmail( email ) {
+        return /^[\w.+_]+@[\w_]+\.\w{2,}(?:\.\w{2})?$/.test( email )
+    }
 })(window, document);
