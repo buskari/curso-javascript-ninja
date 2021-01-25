@@ -1,75 +1,84 @@
-/*
-Nossa calculadora agora está funcional! A ideia desse desafio é modularizar
-o código, conforme vimos na aula anterior. Quebrar as responsabilidades
-em funções, onde cada função faça somente uma única coisa, e faça bem feito.
+(function (window, document){ 
+  /*
+  Nossa calculadora agora está funcional! A ideia desse desafio é modularizar
+  o código, conforme vimos na aula anterior. Quebrar as responsabilidades
+  em funções, onde cada função faça somente uma única coisa, e faça bem feito.
 
-- Remova as duplicações de código;
-- agrupe os códigos que estão soltos em funções (declarações de variáveis,
-listeners de eventos, etc);
-- faça refactories para melhorar esse código, mas de forma que o mantenha com a
-mesma funcionalidade.
-*/
+  - Remova as duplicações de código;
+  - agrupe os códigos que estão soltos em funções (declarações de variáveis,
+  listeners de eventos, etc);
+  - faça refactories para melhorar esse código, mas de forma que o mantenha com a
+  mesma funcionalidade.
+  */
 
-var $visor = document.querySelector('[data-js="visor"]');
-var $buttonsNumbers = document.querySelectorAll('[data-js="button-number"]');
-var $buttonsOperations = document.querySelectorAll('[data-js="button-operation"]');
-var $buttonCE = document.querySelector('[data-js="button-ce"]');
-var $buttonEqual = document.querySelector('[data-js="button-equal"]');
+  const $visor = document.querySelector('[data-js="visor"]');
+  const $buttons = document.querySelectorAll('button');
 
-Array.prototype.forEach.call($buttonsNumbers, function(button) {
-  button.addEventListener('click', handleClickNumber, false);
-});
-Array.prototype.forEach.call($buttonsOperations, function(button) {
-  button.addEventListener('click', handleClickOperation, false);
-});
-$buttonCE.addEventListener('click', handleClickCE, false);
-$buttonEqual.addEventListener('click', handleClickEqual, false);
+  Array.prototype.forEach.call( $buttons, button => {
+    button.addEventListener('click', () => {
+      if (button.value.match(/\d/)) {
+        if ($visor.value === '0') {
+            $visor.value = button.value;
+        } else {
+            $visor.value += button.value;
+        }
+      } else if (button.value === 'ce') {
+          $visor.value = '0';
+      } else if (button.value === '=') {
+        const res = $visor.value.match(/(?:\d+)[\/*+-]?/g);
+        $visor.value = res.reduce((accumulated, value) => {
+          let firstNumber = accumulated.slice(0,-1);
+          let operator = accumulated.slice(-1);
+          let secondNumber = value;
+          let result;
+          if (value.slice(-1).match(/\D/)) {
+            secondNumber = value.slice(0,-1);
+            var nextOperator = value.slice(-1);
+          }
+          switch (operator) {
+            case '+':
+              result = Number(firstNumber) + Number(secondNumber);
+              result.toString();
+              if (nextOperator) {
+                  result += nextOperator;
+              }
+              return result;
+            case '-':
+              result = Number(firstNumber) - Number(secondNumber);
+              result.toString();
+              if (nextOperator) {
+                  result += nextOperator;
+              }
+              return result;
+            case '*':
+              result = Number(firstNumber) * Number(secondNumber);
+              result.toString();
+              if (nextOperator) {
+                  result += nextOperator;
+              }
+              return result;
+            case '/':
+              result = Number(firstNumber) / Number(secondNumber);
+              result.toString();
+              if (nextOperator) {
+                  result += nextOperator;
+              }
+              return result;
+            default:
+              return 'SynstaxError';
+        }
+      })
+    } else {
+        if ($visor.value[$visor.value.length-1].match(/\D/)) {
+          $visor.value =  $visor.value.slice(0, -1) + button.value;
+        } else {
+          $visor.value += button.value;
+        }
+      }
+    })
+  })
 
-function handleClickNumber() {
-  $visor.value += this.value;
-}
-
-function handleClickOperation() {
-  $visor.value = removeLastItemIfItIsAnOperator($visor.value);
-  $visor.value += this.value;
-}
-
-function handleClickCE() {
-  $visor.value = 0;
-}
-
-function isLastItemAnOperation(number) {
-  var operations = ['+', '-', 'x', '÷'];
-  var lastItem = number.split('').pop();
-  return operations.some(function(operator) {
-    return operator === lastItem;
-  });
-}
-
-function removeLastItemIfItIsAnOperator(number) {
-  if(isLastItemAnOperation(number)) {
-    return number.slice(0, -1);
+  function handleClick () {
+    
   }
-  return number;
-}
-
-function handleClickEqual() {
-  $visor.value = removeLastItemIfItIsAnOperator($visor.value);
-  var allValues = $visor.value.match(/\d+[+x÷-]?/g);
-  $visor.value = allValues.reduce(function(accumulated, actual) {
-    var firstValue = accumulated.slice(0, -1);
-    var operator = accumulated.split('').pop();
-    var lastValue = removeLastItemIfItIsAnOperator(actual);
-    var lastOperator = isLastItemAnOperation(actual) ? actual.split('').pop() : '';
-    switch(operator) {
-      case '+':
-        return ( Number(firstValue) + Number(lastValue) ) + lastOperator;
-      case '-':
-        return ( Number(firstValue) - Number(lastValue) ) + lastOperator;
-      case 'x':
-        return ( Number(firstValue) * Number(lastValue) ) + lastOperator;
-      case '÷':
-        return ( Number(firstValue) / Number(lastValue) ) + lastOperator;
-    }
-  });
-}
+})(window, document)
