@@ -1,4 +1,5 @@
 (function (window, document){ 
+  'use strict';
   /*
   Nossa calculadora agora está funcional! A ideia desse desafio é modularizar
   o código, conforme vimos na aula anterior. Quebrar as responsabilidades
@@ -14,71 +15,77 @@
   const $visor = document.querySelector('[data-js="visor"]');
   const $buttons = document.querySelectorAll('button');
 
-  Array.prototype.forEach.call( $buttons, button => {
-    button.addEventListener('click', () => {
-      if (button.value.match(/\d/)) {
-        if ($visor.value === '0') {
-            $visor.value = button.value;
-        } else {
-            $visor.value += button.value;
-        }
-      } else if (button.value === 'ce') {
-          $visor.value = '0';
-      } else if (button.value === '=') {
-        const res = $visor.value.match(/(?:\d+)[\/*+-]?/g);
-        $visor.value = res.reduce((accumulated, value) => {
-          let firstNumber = accumulated.slice(0,-1);
-          let operator = accumulated.slice(-1);
-          let secondNumber = value;
-          let result;
-          if (value.slice(-1).match(/\D/)) {
-            secondNumber = value.slice(0,-1);
-            var nextOperator = value.slice(-1);
-          }
-          switch (operator) {
-            case '+':
-              result = Number(firstNumber) + Number(secondNumber);
-              result.toString();
-              if (nextOperator) {
-                  result += nextOperator;
-              }
-              return result;
-            case '-':
-              result = Number(firstNumber) - Number(secondNumber);
-              result.toString();
-              if (nextOperator) {
-                  result += nextOperator;
-              }
-              return result;
-            case '*':
-              result = Number(firstNumber) * Number(secondNumber);
-              result.toString();
-              if (nextOperator) {
-                  result += nextOperator;
-              }
-              return result;
-            case '/':
-              result = Number(firstNumber) / Number(secondNumber);
-              result.toString();
-              if (nextOperator) {
-                  result += nextOperator;
-              }
-              return result;
-            default:
-              return 'SynstaxError';
-        }
-      })
-    } else {
-        if ($visor.value[$visor.value.length-1].match(/\D/)) {
-          $visor.value =  $visor.value.slice(0, -1) + button.value;
-        } else {
-          $visor.value += button.value;
-        }
-      }
+  function initialize() {
+    initEvents();
+  }
+
+  function initEvents() {
+    Array.prototype.forEach.call($buttons, button => {
+      button.addEventListener('click', handleClick);
     })
-  })
+  }
 
   function handleClick () {
-    
+    if (this.value.match(/\d/)) {
+      removeUnecessaryZero(this);
+    } else if (this.value === 'ce') {
+        $visor.value = '0';
+    } else if (this.value === '=') {
+      handleEqualSign();
+  } else {
+     replaceOperatorAtTheEnd(this);
+    }
   }
+
+  function removeUnecessaryZero(button) {
+    if ($visor.value === '0') {
+      $visor.value = button.value;
+    } else {
+      $visor.value += button.value;
+    }
+  }
+
+  function handleEqualSign() {
+    const res = $visor.value.match(/(?:\d+)[\/*+-]?/g);
+      $visor.value = res.reduce(calculate);
+  }
+
+  function calculate (accumulated, value) {
+    let firstNumber = accumulated.slice(0,-1);
+    let operator = accumulated.slice(-1);
+    let secondNumber = getSecondNumber(value);
+    let nextOperator = getNextOperator(value);
+    return executeOperation(firstNumber, secondNumber, operator) + nextOperator;
+  }
+
+  function getNextOperator(value) {
+    return value.slice(-1).match(/\D/) ? value.slice(-1) : '';
+  }
+
+  function getSecondNumber(value) {
+    return value.slice(-1).match(/\D/) ? value.slice(0,-1) : value;
+  }
+
+  function executeOperation(firstNumber, secondNumber, operator) {
+    switch (operator) {
+      case '+':
+        return Number(firstNumber) + Number(secondNumber);
+      case '-':
+        return Number(firstNumber) - Number(secondNumber);
+      case '*':
+        return Number(firstNumber) * Number(secondNumber);
+      case '/':
+        return Number(firstNumber) / Number(secondNumber);
+   }
+  }
+
+  function replaceOperatorAtTheEnd(button) {
+    if ($visor.value[$visor.value.length-1].match(/\D/)) {
+      $visor.value =  $visor.value.slice(0, -1) + button.value;
+    } else {
+      $visor.value += button.value;
+    }
+  }
+
+  initialize();
 })(window, document)
